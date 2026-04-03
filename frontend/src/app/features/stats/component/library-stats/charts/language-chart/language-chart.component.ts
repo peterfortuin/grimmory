@@ -253,19 +253,21 @@ export class LanguageChartComponent {
 
   private normalizeLanguage(language: string): string {
     const lower = language.toLowerCase().trim();
-    // Check if it maps to a known language
+    // Try exact match first (e.g., 'en', 'eng', 'english')
     if (LANGUAGE_NAMES[lower]) {
-      return lower;
+      return LANGUAGE_NAMES[lower];
+    }
+    // Try stripping country/region suffix (e.g., 'en-US' → 'en', 'zh_TW' → 'zh')
+    const baseCode = lower.split(/[-_]/)[0];
+    if (baseCode && LANGUAGE_NAMES[baseCode]) {
+      return LANGUAGE_NAMES[baseCode];
     }
     return lower;
   }
 
   private getDisplayName(language: string): string {
-    const lower = language.toLowerCase();
-    if (LANGUAGE_NAMES[lower]) {
-      return LANGUAGE_NAMES[lower];
-    }
-    // Capitalize first letter if no mapping found
+    // For known languages the normalized key is already the display name.
+    // For unknown languages, capitalize the first letter.
     return language.charAt(0).toUpperCase() + language.slice(1);
   }
 }

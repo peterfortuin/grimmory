@@ -103,7 +103,7 @@ describe('LanguageChartComponent', () => {
     expect(component.chartData()).toEqual({labels: [], datasets: []});
   });
 
-  it('aggregates exact normalized keys, shapes mapped and fallback labels, and filters books to the selected library', () => {
+  it('groups language variants into one bucket, shapes mapped and fallback labels, and filters books to the selected library', () => {
     books.set([
       createBook(1, 1, ' EN '),
       createBook(2, 1, 'en'),
@@ -123,12 +123,26 @@ describe('LanguageChartComponent', () => {
     expect(component.totalBooks()).toBe(9);
     expect(component.booksWithLanguage()).toBe(7);
     expect(component.languageStats()).toEqual([
-      {language: 'en', displayName: 'English', count: 2, percentage: (2 / 7) * 100},
-      {language: 'eng', displayName: 'English', count: 1, percentage: (1 / 7) * 100},
-      {language: 'english', displayName: 'English', count: 1, percentage: (1 / 7) * 100},
-      {language: 'spa', displayName: 'Spanish', count: 1, percentage: (1 / 7) * 100},
-      {language: 'spanish', displayName: 'Spanish', count: 1, percentage: (1 / 7) * 100},
+      {language: 'English', displayName: 'English', count: 4, percentage: (4 / 7) * 100},
+      {language: 'Spanish', displayName: 'Spanish', count: 2, percentage: (2 / 7) * 100},
       {language: 'klingon', displayName: 'Klingon', count: 1, percentage: (1 / 7) * 100},
+    ]);
+  });
+
+  it('normalizes locale codes with country suffix to the base language', () => {
+    books.set([
+      createBook(1, 1, 'en-US'),
+      createBook(2, 1, 'en_GB'),
+      createBook(3, 1, 'en'),
+      createBook(4, 1, 'zh-TW'),
+      createBook(5, 1, 'zh'),
+    ]);
+
+    const component = createComponent();
+
+    expect(component.languageStats()).toEqual([
+      {language: 'English', displayName: 'English', count: 3, percentage: (3 / 5) * 100},
+      {language: 'Chinese', displayName: 'Chinese', count: 2, percentage: (2 / 5) * 100},
     ]);
   });
 
